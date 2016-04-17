@@ -1,0 +1,36 @@
+{
+  "name": "asmaster/twig-extension",
+  "description": "A collection of custom extensions for the Twig template engine",
+  "type": "library",
+  "keywords": [
+    "twig",
+    "psr-7"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/AlexMasterov/twig-extension",
+  "authors": [{
+    "name": "Alex Masterov",
+    "email": "alex.masterow@gmail.com"
+  }],
+  "require": {
+    "php": "^5.4 || ^7.0",
+    "twig/twig": "^1.2",
+    "psr/http-message": "~1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^4.5 || ^5.0.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "Asmaster\\TwigExtension\\": "src/"
+    },
+    "exclude-from-classmap": [
+      "/tests/"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Asmaster\\TwigExtension\\Tests\\": "tests/"
+    }
+  }
+}
