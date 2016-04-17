@@ -57,12 +57,12 @@ class Psr7UriExtensionTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider getGenerateAbsoluteUrlData()
      */
-    public function testGenerateAbsoluteUrl($path, $expected, ...$uri)
+    public function testGenerateAbsoluteUrl($path, $expected, $scheme, $host, $port, $basePath)
     {
         $request = $this->request
             ->expects($this->any())
             ->method('getUri')
-            ->willReturn($this->createUri(...$uri));
+            ->willReturn($this->createUri($scheme, $host, $port, $basePath));
 
         $extension = new Psr7UriExtension($this->request);
         $absoluteUrl = $extension->generateAbsoluteUrl($path);
@@ -89,12 +89,12 @@ class Psr7UriExtensionTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider getGenerateRelativeUrlData()
      */
-    public function testGenerateRelativeUrl($path, $expected, ...$uri)
+    public function testGenerateRelativeUrl($path, $expected, $scheme, $host, $port, $basePath)
     {
         $request = $this->request
             ->expects($this->any())
             ->method('getUri')
-            ->willReturn($this->createUri(...$uri));
+            ->willReturn($this->createUri($scheme, $host, $port, $basePath));
 
         $extension = new Psr7UriExtension($this->request);
         $relativeUrl = $extension->generateRelativeUrl($path);
@@ -122,11 +122,11 @@ class Psr7UriExtensionTest extends PHPUnit_Framework_TestCase
      * @param string $scheme
      * @param string $host
      * @param string $port
-     * @param string $path
+     * @param string $basePath
      *
      * @return UriInterface $uri New request URI to use.
      */
-    protected function createUri($scheme, $host, $port, $path)
+    protected function createUri($scheme, $host, $port, $basePath)
     {
         $uri = $this->getMockBuilder(UriInterface::class)
             ->disableOriginalConstructor()
@@ -135,7 +135,7 @@ class Psr7UriExtensionTest extends PHPUnit_Framework_TestCase
         $uri->expects($this->any())->method('getScheme')->willReturn($scheme);
         $uri->expects($this->any())->method('getHost')->willReturn($host);
         $uri->expects($this->any())->method('getPort')->willReturn($port);
-        $uri->expects($this->any())->method('getPath')->willReturn($path);
+        $uri->expects($this->any())->method('getPath')->willReturn($basePath);
 
         return $uri;
     }
