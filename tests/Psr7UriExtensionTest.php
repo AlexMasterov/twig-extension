@@ -26,6 +26,7 @@ class Psr7UriExtensionTest extends PHPUnit_Framework_TestCase
     {
         $extension = new Psr7UriExtension($this->request);
 
+        $this->assertInstanceOf(Twig_ExtensionInterface::class, $extension);
         $this->assertSame('psr7_uri', $extension->getName());
     }
 
