@@ -10,9 +10,9 @@ A collection of custom extensions for the [Twig template engine](http://twig.sen
 
 ## Extensions
 
- [Psr7UriExtension](https://github.com/AlexMasterov/twig-extension/blob/master/src/Psr7UriExtension.php) — provides useful functions for generating URLs using [PSR-7 HTTP message interface](http://www.php-fig.org/psr/psr-7/).
+[Psr7UriExtension](https://github.com/AlexMasterov/twig-extension/blob/master/src/Psr7UriExtension.php) — provides useful functions for generating URLs using [PSR-7 HTTP message interface](http://www.php-fig.org/psr/psr-7/).
 
-Below is an example of use if the current path is _http://example.com/user/mone_:
+Below is an example of use if the current path is `http://example.com/user/mone`:
  ```twig
 {{ absolute_url('images/logo.png') }}  // http://example.com/user/mone/images/logo.png
 {{ relative_url('/images/logo.png') }} // ../images/logo.png
@@ -26,20 +26,22 @@ composer require asmaster/twig-extension
 ```
 
 ## Configuration
-To activate the extension need to register it into the Twig environment:
+To activate the extension you need to register it into the Twig environment:
 ```php
 /*
 * @var $twig    Twig_Environment
-* @var $request PSR7\ServerRequest
+* @var $request ServerRequestInterface
 */
-$twig->addExtension(new Asmaster\TwigExtension\Psr7UriExtension($request));
+$twig->addExtension(
+    new Asmaster\TwigExtension\Psr7UriExtension(ServerRequestInterface $request)
+);
 ```
-The example of registering the extension using [Auryn](https://github.com/rdlowrey/auryn) (dependency injector) and [Diactoros](https://github.com/zendframework/zend-diactoros) (PSR-7 HTTP Message implementation):
+The example of registering the extension using [Auryn](https://github.com/rdlowrey/auryn) and [Diactoros](https://github.com/zendframework/zend-diactoros):
 ```php
-$injector = new Auryn\Injector();
+$injector = new Auryn\Injector;
 $injector->alias(
-    'Psr\Http\Message\ServerRequestInterface',
-    'Zend\Diactoros\ServerRequest'
+    Psr\Http\Message\ServerRequestInterface::class,
+    Zend\Diactoros\ServerRequest::class
 );
 
 /*
