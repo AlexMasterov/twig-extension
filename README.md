@@ -10,7 +10,7 @@ A collection of custom extensions for the [Twig template engine](http://twig.sen
 
 ## Extensions
 
-[`Psr7UriExtension`](https://github.com/AlexMasterov/twig-extension/blob/master/src/Psr7UriExtension.php) — provides useful functions for generating URLs using [PSR-7 HTTP message interface](http://www.php-fig.org/psr/psr-7/).
+[`Psr7UriExtension`](https://github.com/AlexMasterov/twig-extension/blob/master/src/Psr7UriExtension.php) — provides useful functions using [PSR-7 HTTP message interface](http://www.php-fig.org/psr/psr-7/).
 
 | Function        | Description                                                       |
 |-----------------|-------------------------------------------------------------------|
