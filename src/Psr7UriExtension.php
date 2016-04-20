@@ -21,7 +21,7 @@ class Psr7UriExtension extends Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('absolute_url', [$this, 'generateAbsoluteUrl']),
-            new \Twig_SimpleFunction('relative_url', [$this, 'generateRelativeUrl'])
+            new \Twig_SimpleFunction('relative_path', [$this, 'generateRelativePath'])
         ];
     }
 
@@ -59,7 +59,7 @@ class Psr7UriExtension extends Twig_Extension
      *
      * @return string
      */
-    public function generateRelativeUrl($path)
+    public function generateRelativePath($path)
     {
         if ($this->isNetworkPath($path) || !$this->hasLeadingSlash($path)) {
             return $path;

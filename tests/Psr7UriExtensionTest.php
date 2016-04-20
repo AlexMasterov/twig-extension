@@ -51,7 +51,7 @@ class Psr7UriExtensionTest extends PHPUnit_Framework_TestCase
     {
         return [[
             'absolute_url',
-            'relative_url'
+            'relative_path'
        ]];
     }
 
@@ -98,9 +98,9 @@ class Psr7UriExtensionTest extends PHPUnit_Framework_TestCase
             ->willReturn($this->createUri($scheme, $host, $port, $basePath));
 
         $extension = new Psr7UriExtension($this->request);
-        $relativeUrl = $extension->generateRelativeUrl($path);
+        $relativePath = $extension->generateRelativePath($path);
 
-        $this->assertEquals($expected, $relativeUrl);
+        $this->assertEquals($expected, $relativePath);
     }
 
     public function getGenerateRelativeUrlData()
