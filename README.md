@@ -10,13 +10,12 @@ A collection of custom extensions for the [Twig template engine](http://twig.sen
 
 ## Extensions
 
-[Psr7UriExtension](https://github.com/AlexMasterov/twig-extension/blob/master/src/Psr7UriExtension.php) — provides useful functions for generating URLs using [PSR-7 HTTP message interface](http://www.php-fig.org/psr/psr-7/).
+[`Psr7UriExtension`](https://github.com/AlexMasterov/twig-extension/blob/master/src/Psr7UriExtension.php) — provides useful functions for generating URLs using [PSR-7 HTTP message interface](http://www.php-fig.org/psr/psr-7/).
 
-Below is an example of use if the current path is `http://example.com/user/mone`:
- ```twig
-{{ absolute_url('images/logo.png') }}  // http://example.com/user/mone/images/logo.png
-{{ relative_url('/images/logo.png') }} // ../images/logo.png
-```
+| Function        | Description                                                       |
+|-----------------|-------------------------------------------------------------------|
+| `absolute_url`  | Generate an absolute URL for the given absolute or relative path  |
+| `relative_path` | Generate a relative path based on the current path of the URI     |
 
 ## Installation
 
@@ -26,7 +25,7 @@ composer require asmaster/twig-extension
 ```
 
 ## Configuration
-To activate the extension you need to register it into the Twig environment:
+To activate an extension you need to register it into the Twig environment:
 ```php
 /*
 * @var $twig    Twig_Environment
