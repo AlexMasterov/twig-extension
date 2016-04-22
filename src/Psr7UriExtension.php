@@ -68,7 +68,7 @@ class Psr7UriExtension extends Twig_Extension
         $uri = $this->request->getUri();
 
         $basePath = $uri->getPath();
-        if ($basePath === $path) {
+        if (0 === strpos($path, $basePath)) {
             return '';
         }
 

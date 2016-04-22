@@ -88,9 +88,9 @@ class Psr7UriExtensionTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getGenerateRelativeUrlData()
+     * @dataProvider getGenerateRelativePathData()
      */
-    public function testGenerateRelativeUrl($path, $expected, $scheme, $host, $port, $basePath)
+    public function testGenerateRelativePath($path, $expected, $scheme, $host, $port, $basePath)
     {
         $request = $this->request
             ->expects($this->any())
@@ -103,19 +103,25 @@ class Psr7UriExtensionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $relativePath);
     }
 
-    public function getGenerateRelativeUrlData()
+    public function getGenerateRelativePathData()
     {
         return [
-            ['/a/b/c/foo.png', 'foo.png', 'http', 'localhost', null, '/a/b/c/d'],
-            ['/a/b/foo.png', '../foo.png', 'http', 'localhost', null, '/a/b/c/d'],
             ['/a/b/c/d', '', 'http', 'localhost', null, '/a/b/c/d'],
+            ['/a/b/c/d/', '', 'http', 'localhost', null, '/a/b/c/d/'],
             ['/a/b/c/', './', 'http', 'localhost', null, '/a/b/c/d'],
+            ['/a/b/c/', '../', 'http', 'localhost', null, '/a/b/c/d/'],
+            ['/a/b/', '../', 'http', 'localhost', null, '/a/b/c/d'],
+            ['/a/b/', '../../', 'http', 'localhost', null, '/a/b/c/d/'],
+            ['/', '../../../', 'http', 'localhost', null, '/a/b/c/d'],
+            ['/', '../../../../', 'http', 'localhost', null, '/a/b/c/d/'],
+            ['/a/b/foo.png', '../foo.png', 'http', 'localhost', null, '/a/b/c/d'],
+            ['/a/b/c/foo.png', 'foo.png', 'http', 'localhost', null, '/a/b/c/d'],
             ['/a/b/c/other', 'other', 'http', 'localhost', null, '/a/b/c/d'],
             ['/a/b/z/foo.png', '../z/foo.png', 'http', 'localhost', null, '/a/b/c/d'],
             ['/a/b/c/this:that', './this:that', 'http', 'localhost', null, '/a/b/c/d'],
             ['/a/b/c/foo/this:that', 'foo/this:that', 'http', 'localhost', null, '/a/b/c/d'],
-            ['/', '/', 'http', 'localhost', null, ''],
-            ['//', '//', 'http', 'localhost', null, '']
+            ['/', '', 'http', 'localhost', null, '/'],
+            ['//', '//', 'http', 'localhost', null, '/']
         ];
     }
 
