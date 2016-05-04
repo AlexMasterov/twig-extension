@@ -2,8 +2,8 @@
 
 namespace Asmaster\TwigExtension;
 
-use Twig_Extension;
 use Asmaster\TwigExtension\Traits\ServerRequestTrait;
+use Twig_Extension;
 
 class Psr7UriExtension extends Twig_Extension
 {
@@ -103,7 +103,7 @@ class Psr7UriExtension extends Twig_Extension
      */
     protected function isNetworkPath($path)
     {
-        return false !== strpos($path, '://') 
+        return false !== strpos($path, '://')
             || '//' === substr($path, 0, 2);
     }
 
