@@ -4,8 +4,8 @@ namespace Asmaster\TwigExtension\tests;
 
 use Asmaster\TwigExtension\Psr7UriExtension;
 use PHPUnit_Framework_TestCase;
-use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 use Twig_ExtensionInterface;
 
 class Psr7UriExtensionTest extends PHPUnit_Framework_TestCase
