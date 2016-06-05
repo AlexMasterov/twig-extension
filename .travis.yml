@@ -1,26 +1,32 @@
 language: php
 
-php:
-  - 5.5
-  - 5.6
-  - 7.0
-  - hhvm
-
 sudo: false
 
 cache:
   directories:
     - $HOME/.composer/cache
+    - vendor
 
 git:
   depth: 1
 
+matrix:
+  fast_finish: true
+  include:
+    - php: 5.6
+      env:
+        - COMPOSER_FLAGS="--prefer-stable"
+    - php: 7
+    - php: hhvm
+  allow_failures:
+    - php: hhvm
+
 before_script:
-  - travis_retry composer self-update
-  - travis_retry composer update --no-interaction --prefer-source
+  - travis_retry composer self-update --quiet
+  - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-source
 
 script:
-  - vendor/bin/phpunit --disallow-test-output
+  - vendor/bin/phpunit
 
 after_script:
   - bash -c '[[ -f "build/logs/clover.xml" ]] && wget https://scrutinizer-ci.com/ocular.phar'
