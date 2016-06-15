@@ -10,6 +10,10 @@ cache:
 git:
   depth: 1
 
+env:
+  global:
+    - PHPUNIT_VERSION="^5.4"
+
 matrix:
   fast_finish: true
   include:
@@ -24,6 +28,7 @@ matrix:
 before_script:
   - travis_retry composer self-update --quiet
   - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-dist
+  - travis_retry composer require phpunit/phpunit:${PHPUNIT_VERSION}
 
 script:
   - vendor/bin/phpunit
