@@ -26,7 +26,6 @@ matrix:
     - php: hhvm
 
 before_script:
-  - travis_retry composer self-update --quiet
   - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-dist
   - travis_retry composer require phpunit/phpunit:${PHPUNIT_VERSION}
 
