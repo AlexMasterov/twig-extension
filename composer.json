@@ -1,5 +1,5 @@
 {
-  "name": "asmaster/twig-extension",
+  "name": "alexmasterov/twig-extension",
   "description": "A collection of custom extensions for the Twig template engine",
   "type": "library",
   "keywords": [
@@ -15,20 +15,17 @@
   }],
   "require": {
     "php": "^5.4 || ^7.0",
-    "twig/twig": "^1.2",
+    "twig/twig": "^1.25 || ^2.0",
     "psr/http-message": "^1.0"
   },
   "autoload": {
     "psr-4": {
-      "Asmaster\\TwigExtension\\": "src/"
-    },
-    "exclude-from-classmap": [
-      "/tests/"
-    ]
+      "AlexMasterov\\TwigExtension\\": "src/"
+    }
   },
   "autoload-dev": {
     "psr-4": {
-      "Asmaster\\TwigExtension\\Tests\\": "tests/"
+      "AlexMasterov\\TwigExtension\\Tests\\": "tests/"
     }
   },
   "extra": {

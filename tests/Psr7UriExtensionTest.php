@@ -1,8 +1,8 @@
 <?php
 
-namespace Asmaster\TwigExtension\tests;
+namespace AlexMasterov\TwigExtension\tests;
 
-use Asmaster\TwigExtension\Psr7UriExtension;
+use AlexMasterov\TwigExtension\Psr7UriExtension;
 use PHPUnit_Framework_TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;

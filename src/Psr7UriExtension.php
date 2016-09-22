@@ -1,8 +1,8 @@
 <?php
 
-namespace Asmaster\TwigExtension;
+namespace AlexMasterov\TwigExtension;
 
-use Asmaster\TwigExtension\Traits\ServerRequestTrait;
+use AlexMasterov\TwigExtension\Traits\ServerRequestTrait;
 use Twig_Extension;
 
 class Psr7UriExtension extends Twig_Extension
@@ -68,7 +68,7 @@ class Psr7UriExtension extends Twig_Extension
         $uri = $this->request->getUri();
 
         $basePath = $uri->getPath();
-        if (0 === strpos($path, $basePath)) {
+        if ($path === $basePath) {
             return '';
         }
 

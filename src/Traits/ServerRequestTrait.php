@@ -1,6 +1,6 @@
 <?php
 
-namespace Asmaster\TwigExtension\Traits;
+namespace AlexMasterov\TwigExtension\Traits;
 
 use Psr\Http\Message\ServerRequestInterface;
 
