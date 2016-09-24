@@ -2,12 +2,27 @@
 
 namespace AlexMasterov\TwigExtension;
 
-use AlexMasterov\TwigExtension\Traits\ServerRequestTrait;
+use AlexMasterov\TwigExtension\AbsoluteUrlGenerator;
+use AlexMasterov\TwigExtension\RelativePathGenerator;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 use Twig_Extension;
+use Twig_SimpleFunction;
 
-class Psr7UriExtension extends Twig_Extension
+final class Psr7UriExtension extends Twig_Extension
 {
-    use ServerRequestTrait;
+    /**
+     * @var ServerRequestInterface
+     */
+    private $request;
+
+    /**
+     * @param ServerRequestInterface $request
+     */
+    public function __construct(ServerRequestInterface $request)
+    {
+        $this->request = $request;
+    }
 
     /**
      * @return string The extension name
@@ -20,8 +35,8 @@ class Psr7UriExtension extends Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('absolute_url', [$this, 'generateAbsoluteUrl']),
-            new \Twig_SimpleFunction('relative_path', [$this, 'generateRelativePath'])
+            new Twig_SimpleFunction('absolute_url', [$this, 'generateAbsoluteUrl']),
+            new Twig_SimpleFunction('relative_path', [$this, 'generateRelativePath'])
         ];
     }
 
@@ -30,28 +45,25 @@ class Psr7UriExtension extends Twig_Extension
      *
      * @return string
      */
-    public function generateAbsoluteUrl($path)
+    public function generateAbsoluteUrl($path = null)
     {
+        $url = $this->absoluteUrl(
+            $this->request->getUri()
+        );
+
+        if (null === $path) {
+            return $url;
+        }
+
         if ($this->isNetworkPath($path)) {
             return $path;
         }
 
-        $uri = $this->request->getUri();
-
-        $host = $uri->getHost();
-        if (empty($host)) {
-            return $path;
+        if (!$this->hasLeadingSlash($url)) {
+            $url = rtrim($url, '/') . "{$path}";
         }
 
-        if (null !== $uri->getPort()) {
-            $host .= ':' . $uri->getPort();
-        }
-
-        if (!$this->hasLeadingSlash($path)) {
-            $path = rtrim($uri->getPath(), '/') . '/' . $path;
-        }
-
-        return $uri->getScheme() . '://' . $host . $path;
+        return $url;
     }
 
     /**
@@ -65,35 +77,38 @@ class Psr7UriExtension extends Twig_Extension
             return $path;
         }
 
-        $uri = $this->request->getUri();
-
-        $basePath = $uri->getPath();
-        if ($path === $basePath) {
-            return '';
-        }
-
-        $baseParts = explode('/', $basePath, -1);
-        $pathParts = explode('/', $path);
-
-        foreach ($baseParts as $i => $segment) {
-            if (isset($pathParts[$i]) && $segment === $pathParts[$i]) {
-                unset($baseParts[$i], $pathParts[$i]);
-            } else {
-                break;
-            }
-        }
-
-        $path = str_repeat('../', count($baseParts)) . implode('/', $pathParts);
-
-        if (empty($path)) {
-            return './';
-        }
-
-        if (empty($baseParts) && false !== strpos(current($pathParts), ':')) {
-            $path = './' . $path;
-        }
+        $path = $this->relativePath(
+            $this->request->getUri(),
+            $path
+        );
 
         return $path;
+    }
+
+    /**
+     * @param UriInterface $uri
+     *
+     * @return string
+     */
+    private function absoluteUrl(UriInterface $uri)
+    {
+        $generator = new AbsoluteUrlGenerator();
+        $absoluteUrl = $generator($uri);
+
+        return $absoluteUrl;
+    }
+
+    /**
+     * @param UriInterface $uri
+     *
+     * @return string
+     */
+    private function relativePath(UriInterface $uri, $path)
+    {
+        $generator = new RelativePathGenerator();
+        $relativePath = $generator($uri, $path);
+
+        return $relativePath;
     }
 
     /**
@@ -101,7 +116,7 @@ class Psr7UriExtension extends Twig_Extension
      *
      * @return bool
      */
-    protected function isNetworkPath($path)
+    private function isNetworkPath($path)
     {
         return false !== strpos($path, '://')
             || '//' === substr($path, 0, 2);
@@ -112,7 +127,7 @@ class Psr7UriExtension extends Twig_Extension
      *
      * @return bool
      */
-    protected function hasLeadingSlash($path)
+    private function hasLeadingSlash($path)
     {
         return isset($path[0]) && '/' === $path[0];
     }

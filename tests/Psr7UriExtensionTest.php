@@ -1,50 +1,25 @@
 <?php
 
-namespace AlexMasterov\TwigExtension\tests;
+namespace AlexMasterov\TwigExtension\Tests;
 
 use AlexMasterov\TwigExtension\Psr7UriExtension;
-use PHPUnit_Framework_TestCase;
+use AlexMasterov\TwigExtension\Tests\UriMockTrait;
+use PHPUnit_Framework_TestCase as TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Twig_ExtensionInterface;
 
-class Psr7UriExtensionTest extends PHPUnit_Framework_TestCase
+class Psr7UriExtensionTest extends TestCase
 {
-    /**
-     * @var ServerRequestInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $request;
+    use UriMockTrait;
 
-    public function setUp()
+    public function testThatExtensionIsValid()
     {
-        $this->request = $this->getMockBuilder(ServerRequestInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    public function testExtension()
-    {
-        $extension = new Psr7UriExtension($this->request);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $extension = new Psr7UriExtension($request);
 
         $this->assertInstanceOf(Twig_ExtensionInterface::class, $extension);
         $this->assertSame('psr7_uri', $extension->getName());
-    }
-
-    /**
-     * @dataProvider getFunctions()
-     */
-    public function testExtensionFunctions($function)
-    {
-        $extension = new Psr7UriExtension($this->request);
-
-        $functions = array_map(
-            function ($function) {
-                return $function->getName();
-            },
-            $extension->getFunctions()
-        );
-
-        $this->assertContains($function, $functions);
     }
 
     public function getFunctions()
@@ -56,94 +31,80 @@ class Psr7UriExtensionTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getGenerateAbsoluteUrlData()
+     * @dataProvider getFunctions()
      */
-    public function testGenerateAbsoluteUrl($path, $expected, $scheme, $host, $port, $basePath)
+    public function testThatExtensionContainsFunction($function)
     {
-        $request = $this->request
+        $request = $this->createMock(ServerRequestInterface::class);
+        $extension = new Psr7UriExtension($request);
+
+        $extensionFunction = array_map(
+            function ($function) {
+                return $function->getName();
+            },
+            $extension->getFunctions()
+        );
+
+        $this->assertContains($function, $extensionFunction);
+    }
+
+    public function testGenerateAbsoluteUrlThenPathIsMissing()
+    {
+        $path = null;
+        $expected = 'http://localhost:80/test';
+
+        $uri = $this->createMockUri('http', 'localhost', '/test', 80);
+
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request
             ->expects($this->any())
             ->method('getUri')
-            ->willReturn($this->createUri($scheme, $host, $port, $basePath));
+            ->willReturn($uri)
+            ;
 
-        $extension = new Psr7UriExtension($this->request);
+        $extension = new Psr7UriExtension($request);
         $absoluteUrl = $extension->generateAbsoluteUrl($path);
 
         $this->assertEquals($expected, $absoluteUrl);
     }
 
-    public function getGenerateAbsoluteUrlData()
+    public function testGenerateAbsoluteUrlThenPathIsNetwork()
     {
-        return [
-            ['/foo.png', '/foo.png', 'http', '', null, '/foo.png'],
-            ['/foo.png', 'http://localhost/foo.png', 'http', 'localhost', null, '/'],
-            ['/foo.png', 'http://localhost/foo.png', 'http', 'localhost', null, '/foo.png'],
-            ['foo.png', 'http://localhost/foo/foo.png', 'http', 'localhost', null, '/foo'],
-            ['foo.png', 'http://localhost/bar/foo.png', 'http', 'localhost', null, '/bar'],
-            ['foo.png', 'http://localhost/foo/bar/foo.png', 'http', 'localhost', null, '/foo/bar'],
-            ['/foo.png', 'http://localhost:8080/foo.png', 'http', 'localhost', 8080, '/'],
-            ['/foo.png', 'https://localhost/foo.png', 'https', 'localhost', null, '/'],
-            ['/', 'http://localhost/', 'http', 'localhost', null, '/'],
-            ['//', '//', 'http', 'localhost', null, '/']
-        ];
-    }
+        $path = '//';
+        $expected = '//';
 
-    /**
-     * @dataProvider getGenerateRelativePathData()
-     */
-    public function testGenerateRelativePath($path, $expected, $scheme, $host, $port, $basePath)
-    {
-        $request = $this->request
+        $uri = $this->createMockUri('http', 'localhost', '/test', 80);
+
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request
             ->expects($this->any())
             ->method('getUri')
-            ->willReturn($this->createUri($scheme, $host, $port, $basePath));
+            ->willReturn($uri)
+            ;
 
-        $extension = new Psr7UriExtension($this->request);
-        $relativePath = $extension->generateRelativePath($path);
+        $extension = new Psr7UriExtension($request);
+        $absoluteUrl = $extension->generateAbsoluteUrl($path);
 
-        $this->assertEquals($expected, $relativePath);
+        $this->assertEquals($expected, $absoluteUrl);
     }
 
-    public function getGenerateRelativePathData()
+    public function testGenerateAbsoluteUrlThenPathHasLeadingSlash()
     {
-        return [
-            ['/a/b/c/d', '', 'http', 'localhost', null, '/a/b/c/d'],
-            ['/a/b/c/d/', '', 'http', 'localhost', null, '/a/b/c/d/'],
-            ['/a/b/c/', './', 'http', 'localhost', null, '/a/b/c/d'],
-            ['/a/b/c/', '../', 'http', 'localhost', null, '/a/b/c/d/'],
-            ['/a/b/', '../', 'http', 'localhost', null, '/a/b/c/d'],
-            ['/a/b/', '../../', 'http', 'localhost', null, '/a/b/c/d/'],
-            ['/', '../../../', 'http', 'localhost', null, '/a/b/c/d'],
-            ['/', '../../../../', 'http', 'localhost', null, '/a/b/c/d/'],
-            ['/a/b/foo.png', '../foo.png', 'http', 'localhost', null, '/a/b/c/d'],
-            ['/a/b/c/foo.png', 'foo.png', 'http', 'localhost', null, '/a/b/c/d'],
-            ['/a/b/c/other', 'other', 'http', 'localhost', null, '/a/b/c/d'],
-            ['/a/b/z/foo.png', '../z/foo.png', 'http', 'localhost', null, '/a/b/c/d'],
-            ['/a/b/c/this:that', './this:that', 'http', 'localhost', null, '/a/b/c/d'],
-            ['/a/b/c/foo/this:that', 'foo/this:that', 'http', 'localhost', null, '/a/b/c/d'],
-            ['/', '', 'http', 'localhost', null, '/'],
-            ['//', '//', 'http', 'localhost', null, '/']
-        ];
-    }
+        $path = '/';
+        $expected = 'http://localhost:80/test/';
 
-    /**
-     * @param string $scheme
-     * @param string $host
-     * @param string $port
-     * @param string $basePath
-     *
-     * @return UriInterface $uri New request URI to use.
-     */
-    protected function createUri($scheme, $host, $port, $basePath)
-    {
-        $uri = $this->getMockBuilder(UriInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $uri = $this->createMockUri('http', 'localhost', '/test', 80);
 
-        $uri->expects($this->any())->method('getScheme')->willReturn($scheme);
-        $uri->expects($this->any())->method('getHost')->willReturn($host);
-        $uri->expects($this->any())->method('getPort')->willReturn($port);
-        $uri->expects($this->any())->method('getPath')->willReturn($basePath);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request
+            ->expects($this->any())
+            ->method('getUri')
+            ->willReturn($uri)
+            ;
 
-        return $uri;
+        $extension = new Psr7UriExtension($request);
+        $absoluteUrl = $extension->generateAbsoluteUrl($path);
+
+        $this->assertEquals($expected, $absoluteUrl);
     }
 }
